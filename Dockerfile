@@ -7,7 +7,7 @@ WORKDIR /app/user
 RUN apt update -y
 
 # Install developer tools
-RUN apt install -y git
+RUN apt install -y git vim nano sqlite3
 
 # Zsh for those who want it.
 RUN apt install -y zsh
@@ -57,4 +57,5 @@ ENV SECRET_KEY_BASE $(openssl rand -base64 32)
 # RUN chmod +x /usr/bin/init.sh
 
 # ENTRYPOINT ["/usr/bin/init.sh"]
-ENTRYPOINT ["/bin/bash"]
+EXPOSE 3000
+ENTRYPOINT ["/bin/zsh"]
