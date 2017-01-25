@@ -7,7 +7,7 @@ WORKDIR /app/user
 RUN apt update -y
 
 # Install developer tools
-RUN apt install -y git vim nano sqlite3 libsqlite3-dev
+RUN apt install -y git vim nano sqlite3 libsqlite3-dev libpq-dev postgresql-client-9.6 --fix-missing
 
 # Zsh for those who want it.
 RUN apt install -y zsh
@@ -58,4 +58,3 @@ ENV SECRET_KEY_BASE $(openssl rand -base64 32)
 
 # ENTRYPOINT ["/usr/bin/init.sh"]
 EXPOSE 3000
-ENTRYPOINT ["/bin/zsh"]
