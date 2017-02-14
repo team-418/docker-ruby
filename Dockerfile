@@ -7,11 +7,7 @@ WORKDIR /app/user
 RUN apt update -y
 
 # Install developer tools
-RUN apt install -y git vim nano sqlite3 libsqlite3-dev libpq-dev postgresql-client-9.6 --fix-missing
-
-# Zsh for those who want it.
-RUN apt install -y zsh
-RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+RUN apt install -y git zsh vim nano sudo sqlite3 libsqlite3-dev libpq-dev postgresql-client-9.6 --fix-missing
 
 ENV GEM_PATH /app/heroku/ruby/bundle/ruby/2.3.3
 ENV GEM_HOME /app/heroku/ruby/bundle/ruby/2.3.3
@@ -48,6 +44,26 @@ ENV BUNDLE_APP_CONFIG /app/heroku/ruby/.bundle/config
 ENV RAILS_ENV development
 ENV SECRET_KEY_BASE $(openssl rand -base64 32)
 
+# Add development user
+RUN useradd -ms /bin/zsh user
+RUN usermod -aG sudo user
+RUN echo 'user:user' | chpasswd
+USER user
+ENV GEM_PATH /app/heroku/ruby/bundle/ruby/2.3.3
+ENV GEM_HOME /app/heroku/ruby/bundle/ruby/2.3.3
+ENV PATH /app/heroku/ruby/ruby-2.3.3/bin:$PATH
+ENV PATH /app/heroku/ruby/node-6.9.4/bin:$PATH
+ENV PATH /app/user/bin:/app/heroku/ruby/bundle/ruby/2.3.3/bin:$PATH
+ENV BUNDLE_APP_CONFIG /app/heroku/ruby/.bundle/config
+
+RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+RUN echo PATH=$PATH | tee -a ~/.bashrc ~/.zshrc
+RUN echo GEM_PATH=$GEM_PATH | tee -a ~/.bashrc ~/.zshrc
+RUN echo GEM_HOME=$GEM_HOME | tee -a ~/.bashrc ~/.zshrc
+
+USER root
+RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
 # # export env vars during run time
 # RUN mkdir -p /app/.profile.d/
 # RUN echo "cd /app/user/" > /app/.profile.d/home.sh
@@ -58,3 +74,5 @@ ENV SECRET_KEY_BASE $(openssl rand -base64 32)
 
 # ENTRYPOINT ["/usr/bin/init.sh"]
 EXPOSE 3000
+
+USER user
